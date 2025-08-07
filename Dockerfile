@@ -27,7 +27,7 @@ COPY . .
 EXPOSE 8000
 
 # The command to run the application
-CMD ["python3", "-m", "main.py"]
+CMD ["python3", "main.py"]
 
 HEALTHCHECK --interval=30s --timeout=300s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8000/health || exit 1
