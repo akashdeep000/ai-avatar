@@ -4,9 +4,6 @@ FROM nvidia/cuda:12.6.0-cudnn-runtime-ubuntu22.04
 # Set non-interactive mode for apt to avoid prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Set DNS resolver
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
-
 # Update and install dependencies
 RUN apt-get -o Acquire::AllowInsecureRepositories=true update && \
     apt-get install -y libxcb-xfixes0 libxcb-shape0 || true && \
