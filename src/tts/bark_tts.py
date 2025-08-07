@@ -16,8 +16,12 @@ class BarkTTS(TTSInterface):
             os.environ["SUNO_OFFLOAD_CPU"] = "False"
 
         # download and load all models
-        preload_models()
-        self.voice = voice
+        try:
+            preload_models()
+            self.voice = voice
+        except Exception as e:
+            logger.critical(f"Failed to preload bark-tts models: {e}")
+            raise
 
     async def synthesize(self, text: str) -> bytes:
         """
