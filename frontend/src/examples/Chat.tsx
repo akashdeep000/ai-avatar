@@ -1,9 +1,9 @@
+import { AiState, AsrState, Message, VoiceInputState } from '@/components/AIAvatar';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import React, { useState } from 'react';
-import { AiState, AsrState, Message, VoiceInputState } from './AIAvatar';
 
 interface ChatProps {
     onSendMessage: (message: string) => void;

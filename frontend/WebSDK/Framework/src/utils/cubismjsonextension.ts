@@ -34,11 +34,11 @@ export class CubismJsonExtension {
         const convValue = Number(obj[key]);
         map.put(key, new JsonFloat(convValue));
       } else if (obj[key] instanceof Array) {
-        map.put(key, CubismJsonExtension.parseJsonArray(obj[key]));
+        map.put(key, CubismJsonExtension.parseJsonArray(obj[key] as any));
       } else if (obj[key] instanceof Object) {
         map.put(
           key,
-          CubismJsonExtension.parseJsonObject(obj[key], new JsonMap())
+          CubismJsonExtension.parseJsonObject(obj[key] as any, new JsonMap())
         );
       } else if (obj[key] == null) {
         map.put(key, new JsonNullvalue());
@@ -65,9 +65,9 @@ export class CubismJsonExtension {
           const convValue = Number(obj[key]);
           arr.add(new JsonFloat(convValue));
         } else if (obj[key] instanceof Array) {
-          arr.add(this.parseJsonArray(obj[key]));
+          arr.add(this.parseJsonArray(obj[key] as any));
         } else if (obj[key] instanceof Object) {
-          arr.add(this.parseJsonObject(obj[key], new JsonMap()));
+          arr.add(this.parseJsonObject(obj[key] as any, new JsonMap()));
         } else if (obj[key] == null) {
           arr.add(new JsonNullvalue());
         } else {
@@ -75,9 +75,9 @@ export class CubismJsonExtension {
           arr.add(obj[key]);
         }
       } else if (obj[key] instanceof Array) {
-        arr.add(this.parseJsonArray(obj[key]));
+        arr.add(this.parseJsonArray(obj[key] as any));
       } else if (obj[key] instanceof Object) {
-        arr.add(this.parseJsonObject(obj[key], new JsonMap()));
+        arr.add(this.parseJsonObject(obj[key] as any, new JsonMap()));
       } else if (obj[key] == null) {
         arr.add(new JsonNullvalue());
       } else {

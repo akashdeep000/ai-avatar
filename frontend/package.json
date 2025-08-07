@@ -4,9 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build-web-sdk": "cd WebSDK/Framework && pnpm install && pnpm run build",
+    "dev": "npm run build-web-sdk && vite",
+    "build": "npm run build-web-sdk && tsc -b && vite build",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
     "preview": "vite preview"
   },
   "dependencies": {

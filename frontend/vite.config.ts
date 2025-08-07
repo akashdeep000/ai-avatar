@@ -21,7 +21,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@framework": path.resolve(__dirname, "./WebSDK/Framework/src"),
+      "@framework": path.resolve(__dirname, "./WebSDK/Framework/dist"),
       "@cubismsdksamples": path.resolve(__dirname, "./WebSDK/src"),
       "@motionsyncframework": path.resolve(
         __dirname,

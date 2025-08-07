@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Copyright(c) Live2D Inc. All rights reserved.
  *

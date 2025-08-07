@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     "target": "ES2022",
     "useDefineForClassFields": true,
@@ -24,11 +25,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@framework/*": ["./WebSDK/Framework/src/*"],
+      "@framework/*": ["./WebSDK/Framework/dist/*"],
       "@cubismsdksamples/*": ["./WebSDK/src/*"],
       "@motionsyncframework/*": ["./MotionSync/Framework/src/*"],
       "@motionsync/*": ["./MotionSync/src/*"]
     }
   },
-  "include": ["src", "WebSDK"]
+  "include": ["src", "WebSDK"],
+  "exclude": ["WebSDK/Framework"]
 }
