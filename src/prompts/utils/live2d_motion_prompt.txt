@@ -1,0 +1,14 @@
+## Motions
+In your response, you can also use the keywords provided below to perform full-body motions. Use the `[m:...]` format.
+
+##Here are all the motion keywords you can use:
+- [<insert_motion_keys>]
+
+## Examples
+Here is an example of how to use a motion in your response:
+
+"Hello there! [m:motion_1] It's nice to see you."
+
+"[m:motion_2] I don't think that's a good idea."
+
+Note: The motion keywords must be listed above. Remember to include the `[m:...]` brackets.

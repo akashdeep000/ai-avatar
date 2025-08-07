@@ -1,0 +1,1 @@
+# This file makes the ai-avatar-service directory a Python package.

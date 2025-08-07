@@ -1,0 +1,39 @@
+[
+  {
+    "name": "mao_pro",
+    "description": "",
+    "url": "/live2d-models/mao_pro/runtime/mao_pro.model3.json",
+    "kScale": 1.0,
+    "initialXshift": 0,
+    "initialYshift": 0,
+    "kXOffset": 1150,
+    "idleMotionGroupName": "Idle",
+    "emotionMap": {
+      "neutral": "exp_01",
+      "anger": "exp_02",
+      "sadness": "exp_03",
+      "joy": "exp_04",
+      "surprise": "exp_05",
+      "fear": "exp_06",
+      "disgust": "exp_07",
+      "smirk": "exp_08"
+    },
+    "motionMap": {
+      "idle": { "group": "Idle", "index": 0 },
+      "talking_hand_move": { "group": "", "index": 0 },
+      "cute_body_move": { "group": "", "index": 1 },
+      "happy_head_move": { "group": "", "index": 2 },
+      "spacial_move_1": { "group": "", "index": 3 },
+      "spacial_move_2": { "group": "", "index": 4 },
+      "spacial_move_3": { "group": "", "index": 5 }
+    },
+    "tapMotions": {
+      "HitAreaHead": {
+        "": 1
+      },
+      "HitAreaBody": {
+        "": 1
+      }
+    }
+  }
+]
