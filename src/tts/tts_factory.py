@@ -2,7 +2,6 @@ from .tts_interface import TTSInterface
 from .dummy_tts import DummyTTS
 from .edge_tts import EdgeTTS
 from .chatterbox_tts import ChatterboxTTS
-from .bark_tts import BarkTTS
 
 class TTSFactory:
     @staticmethod
@@ -14,7 +13,5 @@ class TTSFactory:
             return EdgeTTS(voice=voice, **kwargs)
         elif engine_name == "chatterbox_tts":
             return ChatterboxTTS(**kwargs)
-        elif engine_name == "bark_tts":
-            return BarkTTS(**kwargs)
         else:
             raise ValueError(f"Unknown TTS engine: {engine_name}")

@@ -3,7 +3,6 @@ uvicorn[standard]
 websockets
 PyYAML
 edge-tts
-bark
 httpx
 sherpa-onnx
 faster-whisper

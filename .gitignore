@@ -121,4 +121,5 @@ dmypy.json
 .pyre/
 
 # Custom
+.pip_temp/
 models/

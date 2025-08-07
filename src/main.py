@@ -3,6 +3,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import json
+import sys
 import base64
 import asyncio
 from contextlib import asynccontextmanager
@@ -30,6 +31,7 @@ from loguru import logger
 async def lifespan(app: FastAPI):
     # Configure logging
     logger.remove()
+    logger.add(sys.stderr, level="INFO")
     logger.add(
         "logs/app.log",
         level="INFO",
@@ -112,7 +114,11 @@ async def health_check():
 
 @app.get("/characters")
 async def list_characters():
-    return {"characters": character_manager.list_characters()}
+    all_characters = character_manager.list_characters()
+    available_characters = [
+        char for char in all_characters if char.id in globals.tts_engines
+    ]
+    return {"characters": available_characters}
 
 app.mount("/live2d-models", StaticFiles(directory="live2d-models"), name="live2d-models")
 
