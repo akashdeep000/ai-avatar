@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Update and install dependencies
 RUN apt-get -o Acquire::AllowInsecureRepositories=true update && \
     apt-get install -y libxcb-xfixes0 libxcb-shape0 || true && \
-    apt-get install -y --no-install-recommends ffmpeg curl python3 python3-pip || true && \
+    apt-get install -y --no-install-recommends ffmpeg curl git python3 python3-pip || true && \
     apt --fix-broken install -y && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
