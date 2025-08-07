@@ -3,7 +3,7 @@ import numpy as np
 from .asr_interface import ASRInterface
 
 class FasterWhisperASR(ASRInterface):
-    def __init__(self, model_size="distil-small.en", device="cpu", compute_type="default"):
+    def __init__(self, model_size="small.en", device="cpu", compute_type="int8"):
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
     def transcribe(self, audio_data: np.ndarray, sample_rate: int) -> str:

@@ -13,7 +13,7 @@ class LLMConfig(BaseSettings):
 class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix='APP_', case_sensitive=False, env_file='.env', extra='ignore')
 
-    ASR_ENGINE: str = Field(default="faster_whisper_asr", description="ASR engine to use. Options: 'sherpa_onnx_asr', 'faster_whisper_asr'")
+    ASR_ENGINE: str = Field(default="sherpa_onnx_asr", description="ASR engine to use. Options: 'sherpa_onnx_asr', 'faster_whisper_asr'")
     ASR_DEVICE: str = Field(default="cpu", description="Device for ASR inference, e.g., 'cpu', 'cuda'")
     TTS_DEVICE: str = Field(default="cpu", description="Device for TTS inference, e.g. cpu, cuda")
     ALLOWED_ORIGINS: str = Field(default="*", description="Allowed origins for CORS, comma-separated. Use '*' for all.")
