@@ -96,9 +96,7 @@ export const useInternalPlayback = ({
             gainNode.gain.value = 1.0; // set volume
             track.connect(gainNode).connect(audioContext.destination);
 
-            await audio.play();
-
-            return new Promise<void>((resolve) => {
+            const playPromise = new Promise<void>((resolve, reject) => {
                 audio.onended = () => {
                     if (currentUrlRef.current) {
                         URL.revokeObjectURL(currentUrlRef.current);
@@ -110,7 +108,39 @@ export const useInternalPlayback = ({
                     }
                     resolve();
                 };
+                audio.onerror = (e) => {
+                    console.error('Audio playback error:', e);
+                    reject(new Error('Audio playback error'));
+                };
             });
+
+            try {
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                }
+                await audio.play();
+            } catch (error) {
+                console.warn('audio.play() failed, possibly due to autoplay policy:', error);
+                if (error instanceof Error && error.name === 'NotAllowedError' && audioContext.state === 'suspended') {
+                    const unlockAudio = async () => {
+                        try {
+                            await audioContext.resume();
+                            await audio.play();
+                        } catch (unlockError) {
+                            console.error('Failed to unlock audio context:', unlockError);
+                        } finally {
+                            document.body.removeEventListener('click', unlockAudio);
+                            document.body.removeEventListener('touchstart', unlockAudio);
+                        }
+                    };
+                    document.body.addEventListener('click', unlockAudio, { once: true });
+                    document.body.addEventListener('touchstart', unlockAudio, { once: true });
+                } else {
+                    throw error;
+                }
+            }
+
+            return playPromise;
         },
         []
     );
@@ -122,19 +152,23 @@ export const useInternalPlayback = ({
             setIsSpeaking(true);
 
             const executeTask = async (taskToExecute: PlaybackTask) => {
-                if (taskToExecute.expressions.length > 0) {
-                    setExpression(taskToExecute.expressions[0].name);
-                }
-                if (taskToExecute.motions.length > 0) {
-                    startMotion(taskToExecute.motions[0].group, taskToExecute.motions[0].index, 2);
-                }
+                try {
+                    if (taskToExecute.expressions.length > 0) {
+                        setExpression(taskToExecute.expressions[0].name);
+                    }
+                    if (taskToExecute.motions.length > 0) {
+                        startMotion(taskToExecute.motions[0].group, taskToExecute.motions[0].index, 2);
+                    }
 
-                if (taskToExecute.audio) {
-                    await playAudio(taskToExecute.audio);
+                    if (taskToExecute.audio) {
+                        await playAudio(taskToExecute.audio);
+                    }
+                } catch (error) {
+                    console.error('Error executing playback task:', error);
+                } finally {
+                    setIsSpeaking(false);
+                    dispatch({ type: 'SYSTEM_PLAYBACK_FINISHED' });
                 }
-
-                setIsSpeaking(false);
-                dispatch({ type: 'SYSTEM_PLAYBACK_FINISHED' });
             };
 
             executeTask(task);
