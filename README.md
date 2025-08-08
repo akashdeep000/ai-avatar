@@ -37,7 +37,7 @@ This project is a full-stack application for an open-source, LLM-powered VTuber.
 
 4.  **Run the backend server:**
     ```bash
-    uvicorn src.main:app --reload
+    python3 main.py
     ```
     The backend will be available at `http://localhost:8000`.
 
@@ -254,7 +254,7 @@ Application settings are managed via an `.env` file in the root directory.
 
 These variables must be prefixed with `APP_`.
 
-- `APP_ASR_ENGINE`: The ASR engine to use. Options: `sherpa_onnx_asr`, `faster_whisper_asr`. Default: `faster_whisper_asr`.
+- `APP_ASR_ENGINE`: The ASR engine to use. Options: `sherpa_onnx_asr`, `faster_whisper_asr`. Default: `sherpa_onnx_asr`.
 - `APP_ASR_DEVICE`: The device for Automatic Speech Recognition (`cpu` or `cuda`). Default: `cpu`.
 - `APP_TTS_DEVICE`: The device for Text-to-Speech (`cpu` or `cuda`). Default: `cpu`.
 - `APP_ALLOWED_ORIGINS`: Comma-separated list of allowed origins for CORS. Default: `*`.
