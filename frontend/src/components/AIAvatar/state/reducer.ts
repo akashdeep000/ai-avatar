@@ -33,7 +33,7 @@ export const aiAvatarReducer = (state: AIAvatarState, action: AIAvatarAction): A
         case 'USER_START_RECORDING':
             return { ...state, asrState: 'LISTENING' };
         case 'USER_STOP_RECORDING':
-            return { ...state, asrState: 'PROCESSING' };
+            return { ...state, asrState: state.asrState === "PROCESSING" ? "PROCESSING" : state.asrState === "LISTENING_PROCESSING" ? "PROCESSING" : "IDLE" };
         case 'USER_SELECT_CHARACTER':
             return { ...state, character: state.characters.find(c => c.id === action.payload.characterId) || null, isCharecterLoaded: false };
         case 'USER_INTERRUPT':
