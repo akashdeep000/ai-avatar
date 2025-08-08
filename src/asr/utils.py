@@ -4,6 +4,7 @@ import tarfile
 from pathlib import Path
 from tqdm import tqdm
 from loguru import logger
+import shutil
 
 def download_and_extract(url: str, output_dir: str) -> Path:
     """
@@ -42,19 +43,25 @@ def download_and_extract(url: str, output_dir: str) -> Path:
     total_size = int(response.headers.get("content-length", 0))
     logger.debug(f"Total file size: {total_size / 1024 / 1024:.2f} MB")
 
-    with (
-        open(file_path, "wb") as f,
-        tqdm(
-            desc=file_name,
-            total=total_size,
-            unit="iB",
-            unit_scale=True,
-            unit_divisor=1024,
-        ) as pbar,
-    ):
-        for chunk in response.iter_content(chunk_size=8192):
-            size = f.write(chunk)
-            pbar.update(size)
+    try:
+        with (
+            open(file_path, "wb") as f,
+            tqdm(
+                desc=file_name,
+                total=total_size,
+                unit="iB",
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as pbar,
+        ):
+            for chunk in response.iter_content(chunk_size=8192):
+                size = f.write(chunk)
+                pbar.update(size)
+    except Exception as e:
+        logger.error(f"Failed to download {file_name}: {e}")
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        return None
 
     logger.info(f"Downloaded {file_name} successfully.")
 
@@ -78,10 +85,9 @@ def download_and_extract(url: str, output_dir: str) -> Path:
             # Optionally, clean up the partially extracted files and the downloaded archive
             if os.path.exists(file_path):
                 os.remove(file_path)
-            # You might want to remove the partially extracted directory as well
-            # import shutil
-            # if extracted_dir_path.exists():
-            #     shutil.rmtree(extracted_dir_path)
+            # Optionally, clean up the partially extracted files and the downloaded archive
+            if extracted_dir_path.exists():
+                shutil.rmtree(extracted_dir_path)
             return None
     else:
         logger.warning("The downloaded file is not a tar.bz2 archive.")
@@ -129,6 +135,9 @@ def check_and_extract_local_file(url: str, output_dir: str) -> Path | None:
             logger.error(f"Failed to extract {file_name}: {e}")
             if os.path.exists(compressed_path):
                 os.remove(compressed_path)
+            # Optionally, clean up the partially extracted files and the downloaded archive
+            if extracted_dir_path.exists():
+                shutil.rmtree(extracted_dir_path)
             return None
 
     logger.warning(f"Local file not found or not a tar.bz2 archive: {compressed_path}")

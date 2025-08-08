@@ -52,6 +52,7 @@ class GoogleGeminiLLM(LLMInterface):
 
         if stream:
             for chunk in response:
-                yield chunk.text
+                if chunk.parts:
+                    yield chunk.text
         else:
             yield response.text

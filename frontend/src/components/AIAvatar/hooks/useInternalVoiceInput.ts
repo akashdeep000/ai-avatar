@@ -15,7 +15,7 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
     const [isVadRunning, setIsVadRunning] = useState(false);
 
     // Automatic interrupt for conversation mode
-    const onSpeechStart = useCallback(() => {
+    const onSpeechRealStart = useCallback(() => {
         if (voiceInputState.mode === 'conversation' && (aiState === 'SPEAKING' || aiState === 'THINKING_SPEAKING')) {
             dispatch({ type: 'USER_INTERRUPT' });
             webSocketClient?.sendMessage('user:interrupt', {});
@@ -53,9 +53,15 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
     );
 
     const { loading, start, pause } = useMicVAD({
-        onSpeechStart,
+        onSpeechRealStart,
         onSpeechEnd,
-        model: "v5"
+        model: "v5",
+        positiveSpeechThreshold: 0.5,
+        negativeSpeechThreshold: 0.35,
+        redemptionFrames: 35,
+        frameSamples: 512,
+        preSpeechPadFrames: 3,
+        minSpeechFrames: 2,
     });
 
     // VAD control logic based on ASR state

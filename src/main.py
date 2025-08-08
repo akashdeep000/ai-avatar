@@ -12,10 +12,11 @@ import wave
 from fastapi.responses import HTMLResponse, JSONResponse
 import os
 from dotenv import load_dotenv
+import time
 
 load_dotenv()
 
-from .config import app_config, llm_config
+from .config import app_config, llm_config, asr_config, tts_config
 from .connection_manager import manager
 from .session_manager import session_manager, Session
 from .character_manager import character_manager
@@ -36,7 +37,13 @@ def _load_models_sync():
 
     # Load ASR engine
     try:
-        globals.asr_engine = ASRFactory.get_asr_system(app_config.ASR_ENGINE, device=app_config.ASR_DEVICE)
+        globals.asr_engine = ASRFactory.get_asr_system(
+            asr_config.ENGINE,
+            device=asr_config.DEVICE,
+            model=asr_config.MODEL,
+            compute_type=asr_config.COMPUTE_TYPE,
+            num_threads=asr_config.CPU_THREADS
+        )
         logger.info("ASR engine loaded.")
     except Exception as e:
         logger.error(f"Failed to load ASR engine: {e}")
@@ -161,6 +168,7 @@ async def handle_text_message(session: Session, text: str):
     llm_stream = session.llm_engine.chat(session.history, stream=True)
 
     sentence_buffer = ""
+    first_sentence_processed = False
     try:
         async for chunk in llm_stream:
             if session.interrupted:
@@ -170,13 +178,14 @@ async def handle_text_message(session: Session, text: str):
             llm_response_text += chunk
             sentence_buffer += chunk
 
-            sentences = split_sentences(sentence_buffer)
+            sentences = split_sentences(sentence_buffer, faster_first_response=not first_sentence_processed)
 
             if sentences:
                 for i, sentence in enumerate(sentences):
                     if i < len(sentences) - 1:
                         if sentence.strip():
                             await process_sentence(session, sentence)
+                            first_sentence_processed = True
 
                 sentence_buffer = sentences[-1]
 
@@ -245,13 +254,12 @@ async def handle_user_interrupt(session: Session, payload: dict):
 
 async def handle_user_audio_chunk(session: Session, payload: dict):
     if session.asr_engine:
-        if not session.last_asr_text: # First chunk of a new utterance
-            logger.info("New user utterance started.")
-
         audio_bytes = base64.b64decode(payload["data"])
         audio_np = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
 
+        start_time = time.time()
         partial_text = session.asr_engine.transcribe_np(audio_np)
+        logger.info(f"ASR transcribe took {time.time() - start_time} seconds")
 
         # Implicit interruption ("barge-in")
         # Only interrupt if we get actual text from ASR and a task is active
