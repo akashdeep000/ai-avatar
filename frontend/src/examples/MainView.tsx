@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AIAvatarCanvas, useAIAvatar } from '../components/AIAvatar';
 import Chat from './Chat';
 
 const MainView: React.FC = () => {
+    const [isModelLoaded, setIsModelLoaded] = useState(false);
     const {
         messages,
         voiceInput,
@@ -36,11 +37,11 @@ const MainView: React.FC = () => {
     };
 
     return (
-        <div className="flex h-full">
-            <div className="w-2/3 h-full">
-                <AIAvatarCanvas />
+        <div className="flex h-full flex-col md:flex-row">
+            <div className="w-full h-2/3 md:w-2/3 md:h-full">
+                <AIAvatarCanvas onReady={() => setIsModelLoaded(true)} />
             </div>
-            <div className="w-1/3 h-full border-l">
+            <div className="w-full h-1/3 md:w-1/3 md:h-full border-t md:border-l md:border-t-0">
                 <Chat
                     onSendMessage={sendText}
                     messages={messages}
@@ -55,6 +56,7 @@ const MainView: React.FC = () => {
                     startRecording={startRecording}
                     stopRecording={stopRecording}
                     interrupt={interrupt}
+                    isModelLoaded={isModelLoaded}
                 />
             </div>
         </div>

@@ -3,7 +3,11 @@ import { useLive2DModel } from './hooks/useLive2DModel';
 import { useLive2DResize } from './hooks/useLive2DResize';
 import { useAIAvatar } from './useAIAvatar';
 
-export const Live2DCanvas: React.FC = () => {
+interface Live2DCanvasProps {
+    onReady?: () => void;
+}
+
+export const Live2DCanvas: React.FC<Live2DCanvasProps> = ({ onReady }) => {
     const { character } = useAIAvatar();
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -20,6 +24,7 @@ export const Live2DCanvas: React.FC = () => {
         character: character ?? undefined,
         canvasRef: canvasRef,
         mode: 'chat',
+        onReady,
     });
 
     return (

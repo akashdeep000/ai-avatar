@@ -4,7 +4,7 @@ import { AIAvatarAction, AIAvatarState, PlaybackTask } from './types';
 export const initialState: AIAvatarState = {
     connectionStatus: 'DISCONNECTED',
     aiState: 'IDLE',
-    asrState: 'LISTENING',
+    asrState: 'IDLE',
     messages: [],
     voiceInput: {
         mode: 'conversation',
@@ -89,7 +89,7 @@ export const aiAvatarReducer = (state: AIAvatarState, action: AIAvatarAction): A
         case 'SERVER_CONNECT_SUCCESS':
             return { ...state, connectionStatus: 'CONNECTED', isConnecting: false };
         case 'SERVER_CHARACTER_READY':
-            return { ...state, character: action.payload.character, isCharecterLoaded: true };
+            return { ...state, character: action.payload.character, isCharecterLoaded: true, asrState: 'LISTENING' };
         case 'SERVER_CONNECT_ERROR':
             return { ...state, connectionStatus: 'ERROR' };
         case 'SERVER_DISCONNECTED':

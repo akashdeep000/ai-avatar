@@ -19,6 +19,7 @@ interface ChatProps {
     startRecording: () => void;
     stopRecording: () => void;
     interrupt: () => void;
+    isModelLoaded: boolean;
 }
 
 const Chat: React.FC<ChatProps> = ({
@@ -26,7 +27,6 @@ const Chat: React.FC<ChatProps> = ({
     messages,
     aiState,
     asrState,
-    voiceInput,
     partialTranscript,
     recordingMode,
     setRecordingMode,
@@ -34,6 +34,7 @@ const Chat: React.FC<ChatProps> = ({
     setContinuousListening,
     startRecording,
     stopRecording,
+    isModelLoaded,
 }) => {
     const isRecording = asrState === 'LISTENING' || asrState === 'LISTENING_PROCESSING';
     const [inputValue, setInputValue] = useState('');
@@ -79,27 +80,24 @@ const Chat: React.FC<ChatProps> = ({
                     </div>
                 )}
             </div>
-            <div>
-                AI Sate: {aiState}
-                <br />
-                ASR State: {asrState}
-            </div>
-            <pre>
-                {JSON.stringify(voiceInput, null, 2)}
-            </pre>
             <div className="p-4 border-t">
+                <div className='flex gap-2 pb-4'>
+                    <p>AI Sate: {aiState}</p> |
+                    <p>ASR State: {asrState}</p>
+                </div>
                 <div className="flex gap-2">
                     <Input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                         placeholder="Type a message..."
+                        disabled={!isModelLoaded}
                     />
-                    <Button onClick={handleSendMessage}>Send</Button>
-                    <Button onClick={handleMicClick} variant={isRecording ? 'destructive' : 'outline'}>
+                    <Button onClick={handleSendMessage} disabled={!isModelLoaded}>Send</Button>
+                    <Button onClick={handleMicClick} variant={isRecording ? 'destructive' : 'outline'} disabled={!isModelLoaded}>
                         {isRecording ? 'Stop' : 'Mic'}
                     </Button>
-                    <Select value={recordingMode} onValueChange={(value) => setRecordingMode(value as 'conversation' | 'manual')}>
+                    <Select value={recordingMode} onValueChange={(value) => setRecordingMode(value as 'conversation' | 'manual')} disabled={!isModelLoaded}>
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Mode" />
                         </SelectTrigger>
@@ -116,6 +114,7 @@ const Chat: React.FC<ChatProps> = ({
                             id="continuous-listening"
                             checked={continuousListening}
                             onChange={(e) => setContinuousListening(e.target.checked)}
+                            disabled={!isModelLoaded}
                         />
                         <label htmlFor="continuous-listening" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                             Continuous Listening
