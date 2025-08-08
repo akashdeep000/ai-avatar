@@ -83,7 +83,7 @@ class SherpaOnnxASR(ASRInterface):
             "sense-voice": "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17",
 
             # Parakeet
-            "parakeet-tdt-0.6b-v2": "sherpa-onnx-nemo-parakeet-tdt-0.6b-v2",
+            "parakeet": "sherpa-onnx-nemo-parakeet-tdt-0.6b-v2",
 
             # Whisper Models
             "whisper-tiny": "sherpa-onnx-whisper-tiny",
