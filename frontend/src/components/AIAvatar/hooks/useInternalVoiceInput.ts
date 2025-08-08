@@ -55,13 +55,8 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
     const { loading, start, pause } = useMicVAD({
         onSpeechRealStart,
         onSpeechEnd,
-        model: "v5",
-        frameSamples: 512,
-        positiveSpeechThreshold: 0.5,
-        negativeSpeechThreshold: 0.35,
-        minSpeechFrames: 1,
-        preSpeechPadFrames: 5,
-        redemptionFrames: 45,
+        redemptionFrames: 20,
+        submitUserSpeechOnPause: true,
     });
 
     // VAD control logic based on ASR state

@@ -21,7 +21,8 @@ class AudioProcessor:
         if not app_config.ENABLE_AUDIO_PROCESSING:
             return audio_np
 
-        processed_audio = audio_np
+        padding = np.zeros(int(sample_rate * 1), dtype=np.float32)
+        processed_audio = np.concatenate([padding, audio_np])
 
         if app_config.NOISE_REDUCTION:
             try:
