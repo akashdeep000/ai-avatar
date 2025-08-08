@@ -26,6 +26,7 @@ export const aiAvatarReducer = (state: AIAvatarState, action: AIAvatarAction): A
             return {
                 ...state,
                 aiState: 'THINKING',
+                asrState: state.voiceInput.mode === 'conversation' && state.voiceInput.continuous ? 'LISTENING' : 'IDLE',
                 messages: [...state.messages, { id: uuidv4(), author: 'user', text: action.payload.text }],
                 isLLMComplete: false,
             };
@@ -37,6 +38,19 @@ export const aiAvatarReducer = (state: AIAvatarState, action: AIAvatarAction): A
             return { ...state, character: state.characters.find(c => c.id === action.payload.characterId) || null, isCharecterLoaded: false };
         case 'USER_INTERRUPT':
             return { ...state, aiState: 'IDLE', asrState: 'LISTENING', playbackQueue: [], isLLMComplete: true };
+        case 'USER_AUDIO_CHUNK_SENT':
+            return {
+                ...state,
+                asrState: 'LISTENING_PROCESSING',
+            };
+        case 'USER_AUDIO_END_SENT':
+            if (state.voiceInput.mode === 'conversation') {
+                return {
+                    ...state,
+                    asrState: state.voiceInput.continuous ? 'LISTENING_PROCESSING' : 'PROCESSING',
+                };
+            }
+            return state;
 
         // System Events
         case 'SYSTEM_CONNECT':

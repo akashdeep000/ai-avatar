@@ -39,8 +39,10 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
                 if (typeof reader.result === 'string') {
                     const base64data = reader.result.split(',')[1];
                     webSocketClient.sendMessage('user:audio_chunk', { data: base64data });
+                    dispatch({ type: 'USER_AUDIO_CHUNK_SENT' });
                     if (voiceInputState.mode === 'conversation') {
                         webSocketClient.sendMessage('user:audio_end', {});
+                        dispatch({ type: 'USER_AUDIO_END_SENT' });
                     }
                 }
             };
@@ -53,6 +55,7 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
     const { loading, start, pause } = useMicVAD({
         onSpeechStart,
         onSpeechEnd,
+        model: "v5"
     });
 
     // VAD control logic based on ASR state
@@ -66,6 +69,7 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
             // In manual mode, explicitly send audio_end when recording stops
             if (voiceInputState.mode === 'manual' && asrState === 'PROCESSING') {
                 webSocketClient?.sendMessage('user:audio_end', {});
+                dispatch({ type: 'USER_AUDIO_END_SENT' });
             }
             setIsVadRunning(false);
         }

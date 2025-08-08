@@ -99,6 +99,8 @@ export type AIAvatarAction =
     | { type: 'USER_STOP_RECORDING' }
     | { type: 'USER_SELECT_CHARACTER'; payload: { characterId: string } }
     | { type: 'USER_INTERRUPT' }
+    | { type: 'USER_AUDIO_CHUNK_SENT' }
+    | { type: 'USER_AUDIO_END_SENT' }
 
     // System Events
     | { type: 'SYSTEM_CONNECT' }
