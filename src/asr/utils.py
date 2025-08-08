@@ -62,7 +62,9 @@ def download_and_extract(url: str, output_dir: str) -> Path:
     if file_name.endswith(".tar.bz2"):
         logger.info(f"Extracting {file_name}...")
         with tarfile.open(file_path, "r:bz2") as tar:
-            tar.extractall(path=output_dir)
+            members = tar.getmembers()
+            for member in tqdm(members, desc=f"Extracting {file_name}"):
+                tar.extract(member, path=output_dir)
         logger.info("Extraction completed.")
 
         # Delete the compressed file
@@ -106,7 +108,9 @@ def check_and_extract_local_file(url: str, output_dir: str) -> Path | None:
         try:
             logger.info("⏳ Extracting archive file...")
             with tarfile.open(compressed_path, "r:bz2") as tar:
-                tar.extractall(path=output_dir)
+                members = tar.getmembers()
+                for member in tqdm(members, desc=f"Extracting {file_name}"):
+                    tar.extract(member, path=output_dir)
             logger.success(f"Extracted archive to the path: {extracted_dir}")
             os.remove(compressed_path)  # Remove the compressed file
             return extracted_dir
