@@ -123,3 +123,4 @@ dmypy.json
 # Custom
 .pip_temp/
 models/
+audio_debug/

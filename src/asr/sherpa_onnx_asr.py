@@ -14,7 +14,7 @@ class SherpaOnnxASR(ASRInterface):
         num_threads: int = 4,
         debug: bool = False,
         device: str = "cpu",
-        compute_type: str = "int8",
+        compute_type: str = "",
         language: str = "",
     ) -> None:
         self.model_name = model
@@ -23,7 +23,7 @@ class SherpaOnnxASR(ASRInterface):
         self.device = device
         self.compute_type=compute_type
         self.language=language
-
+        print(self.compute_type)
         if self.device == "cuda":
             try:
                 if "CUDAExecutionProvider" not in onnxruntime.get_available_providers():
@@ -62,6 +62,18 @@ class SherpaOnnxASR(ASRInterface):
                 language=self.language,
                 use_itn=True,
             )
+        elif self.model_name.startswith("parakee"):
+            encoder_path, decoder_path, joiner_path, tokens_path = self._get_model_paths()
+            return sherpa_onnx.OfflineRecognizer.from_transducer(
+                encoder=encoder_path,
+                decoder=decoder_path,
+                joiner=joiner_path,
+                tokens=tokens_path,
+                model_type="nemo_transducer",
+                num_threads=self.num_threads,
+                debug=self.debug,
+                provider=self.device,
+            )
         else:
             raise ValueError(f"Unsupported model name: {self.model_name}")
 
@@ -69,6 +81,9 @@ class SherpaOnnxASR(ASRInterface):
         model_path_dict = {
             # Sense Voice
             "sense-voice": "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17",
+
+            # Parakeet
+            "parakeet-tdt-0.6b-v2": "sherpa-onnx-nemo-parakeet-tdt-0.6b-v2",
 
             # Whisper Models
             "whisper-tiny": "sherpa-onnx-whisper-tiny",
@@ -89,14 +104,24 @@ class SherpaOnnxASR(ASRInterface):
             "whisper-distil-large-v2": "sherpa-onnx-whisper-distil-large-v2",
 
             # Other
-            "whisper-medium-aishell": "sherpa-onnx-whisper-medium-aishell",
             "whisper-turbo": "sherpa-onnx-whisper-turbo",
         }
 
-        if self.model_name not in model_path_dict:
+        model_dir_name = self.model_name
+        if self.model_name.startswith("parakeet"):
+            model_dir_name = "sherpa-onnx-nemo-parakeet-tdt-0.6b-v2"
+            if self.compute_type == "int8":
+                model_dir_name += "-int8"
+            elif self.compute_type == "fp16":
+                model_dir_name += "-fp16"
+
+        if self.model_name not in model_path_dict and not self.model_name.startswith("parakeet"):
             raise ValueError(f"Unsupported model name: {self.model_name}. Supported models are: {list(model_path_dict.keys())}")
 
-        model_dir_name = model_path_dict[self.model_name]
+        if self.model_name in model_path_dict:
+            model_dir_name = model_path_dict[self.model_name]
+
+        logger.info(f"Using asr model: {model_dir_name}")
         model_dir = f"./models/{model_dir_name}"
 
         if not os.path.exists(model_dir):
@@ -127,6 +152,24 @@ class SherpaOnnxASR(ASRInterface):
 
             tokens_path = os.path.join(model_dir, f"{prefix}-tokens.txt")
             return encoder_path, decoder_path, tokens_path
+        elif self.model_name.startswith("parakeet"):
+            encoder_suffix = ".int8"
+            decoder_suffix = ""
+            joiner_suffix = ""
+
+            if self.compute_type == "int8":
+                decoder_suffix = ".int8"
+                joiner_suffix = ".int8"
+            elif self.compute_type == "fp16":
+                encoder_suffix = ".fp16"
+                decoder_suffix = ".fp16"
+                joiner_suffix = ".fp16"
+
+            encoder_path = os.path.join(model_dir, f"encoder{encoder_suffix}.onnx")
+            decoder_path = os.path.join(model_dir, f"decoder{decoder_suffix}.onnx")
+            joiner_path = os.path.join(model_dir, f"joiner{joiner_suffix}.onnx")
+            tokens_path = os.path.join(model_dir, "tokens.txt")
+            return encoder_path, decoder_path, joiner_path, tokens_path
         else: # sense-voice
             return os.path.join(model_dir, "model.onnx"), os.path.join(model_dir, "tokens.txt")
 

@@ -15,8 +15,8 @@ class ASRConfig(BaseSettings):
 
     ENGINE: str = Field(default="sherpa_onnx_asr", description="ASR engine to use. Options: 'sherpa_onnx_asr', 'faster_whisper_asr'")
     DEVICE: str = Field(default="cpu", description="Device for ASR inference, e.g., 'cpu', 'cuda', auto")
-    MODEL: str = Field(default="whisper-distil-small.en", description="Model for Faster Whisper ASR or Model for Sherpa.")
-    COMPUTE_TYPE: str = Field(default="int8", description="Compute type for Faster Whisper ASR.")
+    MODEL: str = Field(default="parakeet", description="Model for Faster Whisper ASR or Model for Sherpa.")
+    COMPUTE_TYPE: str = Field(default=None, description="Compute type for ASR.")
     CPU_THREADS: int = Field(default=4, description="Number of CPU threads for ASR.")
 
 class TTSConfig(BaseSettings):
@@ -28,6 +28,10 @@ class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix='APP_', case_sensitive=False, env_file='.env', extra='ignore')
 
     ALLOWED_ORIGINS: str = Field(default="*", description="Allowed origins for CORS, comma-separated. Use '*' for all.")
+    DEBUG_SAVE_AUDIO: bool = Field(default=False, description="Save original and normalized audio for debugging.")
+    ENABLE_AUDIO_PROCESSING: bool = Field(default=True, description="Enable audio processing.")
+    NOISE_REDUCTION: bool = Field(default=True, description="Enable noise reduction.")
+    LOUDNESS_NORMALIZATION: bool = Field(default=True, description="Enable loudness normalization.")
 
 app_config = AppConfig()
 llm_config = LLMConfig()

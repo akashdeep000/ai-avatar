@@ -8,6 +8,9 @@ import base64
 import asyncio
 from contextlib import asynccontextmanager
 import numpy as np
+import pyloudnorm as pyln
+import soundfile as sf
+from io import BytesIO
 import wave
 from fastapi.responses import HTMLResponse, JSONResponse
 import os
@@ -27,6 +30,7 @@ from .asr.asr_factory import ASRFactory
 from .llm.llm_factory import LLMFactory
 from .tts.tts_factory import TTSFactory
 from loguru import logger
+from .audio.audio_processor import AudioProcessor
 
 def _load_models_sync():
     """
@@ -109,6 +113,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+audio_processor = AudioProcessor()
 
 if app_config.ALLOWED_ORIGINS == "*":
     origins = ["*"]
@@ -257,9 +262,22 @@ async def handle_user_audio_chunk(session: Session, payload: dict):
         audio_bytes = base64.b64decode(payload["data"])
         audio_np = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
 
-        start_time = time.time()
+        audio_process_start_time = time.time()
+        processed_audio_np = audio_processor.process(audio_np, 16000)
+        logger.info(f"Audio processing took {time.time() - audio_process_start_time} seconds")
+
+        if app_config.DEBUG_SAVE_AUDIO:
+            if not os.path.exists("audio_debug"):
+                os.makedirs("audio_debug")
+            timestamp = int(time.time())
+            sf.write(f"audio_debug/{timestamp}_original.wav", audio_np, 16000)
+            sf.write(f"audio_debug/{timestamp}_processed.wav", processed_audio_np, 16000)
+
+        audio_np = processed_audio_np
+
+        asr_start_time = time.time()
         partial_text = session.asr_engine.transcribe_np(audio_np)
-        logger.info(f"ASR transcribe took {time.time() - start_time} seconds")
+        logger.info(f"ASR transcribe took {time.time() - asr_start_time} seconds")
 
         # Implicit interruption ("barge-in")
         # Only interrupt if we get actual text from ASR and a task is active

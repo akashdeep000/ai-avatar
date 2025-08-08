@@ -68,7 +68,7 @@ export const aiAvatarReducer = (state: AIAvatarState, action: AIAvatarAction): A
                     ...state,
                     playbackQueue: newQueue,
                     aiState: 'IDLE',
-                    asrState: state.voiceInput.mode === 'conversation' ? 'LISTENING' : 'IDLE',
+                    asrState: state.voiceInput.mode === 'conversation' && !state.voiceInput.continuous ? 'LISTENING' : state.asrState,
                 };
             }
 

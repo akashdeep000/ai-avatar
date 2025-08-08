@@ -56,12 +56,12 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
         onSpeechRealStart,
         onSpeechEnd,
         model: "v5",
+        frameSamples: 512,
         positiveSpeechThreshold: 0.5,
         negativeSpeechThreshold: 0.35,
-        redemptionFrames: 35,
-        frameSamples: 512,
-        preSpeechPadFrames: 3,
-        minSpeechFrames: 2,
+        minSpeechFrames: 1,
+        preSpeechPadFrames: 5,
+        redemptionFrames: 45,
     });
 
     // VAD control logic based on ASR state

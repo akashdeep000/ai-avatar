@@ -3,7 +3,7 @@ import numpy as np
 from .asr_interface import ASRInterface
 
 class FasterWhisperASR(ASRInterface):
-    def __init__(self, model="distil-small.en", device="cpu", compute_type="int8", language=None, num_threads=4, **kwargs):
+    def __init__(self, model="distil-small.en", device="cpu", compute_type="default", language=None, num_threads=4, **kwargs):
         model_name = model.replace("whisper-", "")
         self.model = WhisperModel(model_size_or_path=model_name, download_root="./models/whisper", device=device, compute_type=compute_type, cpu_threads=num_threads)
 
