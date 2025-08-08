@@ -27,38 +27,35 @@ from .llm.llm_factory import LLMFactory
 from .tts.tts_factory import TTSFactory
 from loguru import logger
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Configure logging
-    logger.remove()
-    logger.add(sys.stderr, level="INFO")
-    logger.add(
-        "logs/app.log",
-        level="INFO",
-        format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
-        rotation="10 MB",
-        compression="zip",
-        serialize=True,  # This enables JSON output
-    )
-    # Load models at startup
-    logger.info("Loading AI models...")
+def _load_models_sync():
+    """
+    Synchronously loads all AI models. This function is designed to be run in a
+    separate thread to avoid blocking the main asyncio event loop.
+    """
+    logger.info("Loading AI models in a background thread...")
 
     # Load ASR engine
-    globals.asr_engine = ASRFactory.get_asr_system(app_config.ASR_ENGINE, device=app_config.ASR_DEVICE)
-    logger.info("ASR engine loaded.")
+    try:
+        globals.asr_engine = ASRFactory.get_asr_system(app_config.ASR_ENGINE, device=app_config.ASR_DEVICE)
+        logger.info("ASR engine loaded.")
+    except Exception as e:
+        logger.error(f"Failed to load ASR engine: {e}")
 
     # Load LLM engine
-    api_key = None
-    if llm_config.LLM_ENGINE == "open_router":
-        api_key = llm_config.OPENROUTER_API_KEY
-    elif llm_config.LLM_ENGINE == "google_gemini":
-        api_key = llm_config.GEMINI_API_KEY
-    globals.llm_engine = LLMFactory.create_llm_engine(
-        llm_config.LLM_ENGINE,
-        api_key=api_key,
-        model=llm_config.LLM_MODEL
-    )
-    logger.info("LLM engine loaded.")
+    try:
+        api_key = None
+        if llm_config.LLM_ENGINE == "open_router":
+            api_key = llm_config.OPENROUTER_API_KEY
+        elif llm_config.LLM_ENGINE == "google_gemini":
+            api_key = llm_config.GEMINI_API_KEY
+        globals.llm_engine = LLMFactory.create_llm_engine(
+            llm_config.LLM_ENGINE,
+            api_key=api_key,
+            model=llm_config.LLM_MODEL
+        )
+        logger.info("LLM engine loaded.")
+    except Exception as e:
+        logger.error(f"Failed to load LLM engine: {e}")
 
     # Load TTS engines for all characters
     characters = character_manager.list_characters()
@@ -74,7 +71,32 @@ async def lifespan(app: FastAPI):
                 logger.error(f"Failed to load TTS engine for character '{character.name}': {e}")
 
     logger.info("All AI models loaded.")
+
+async def load_models_async():
+    """
+    Triggers the synchronous model loading function in a separate thread.
+    """
+    await asyncio.to_thread(_load_models_sync)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Configure logging
+    logger.remove()
+    logger.add(sys.stderr, level="INFO")
+    logger.add(
+        "logs/app.log",
+        level="INFO",
+        format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
+        rotation="10 MB",
+        compression="zip",
+        serialize=True,  # This enables JSON output
+    )
+
+    # Start model loading in a background task
+    asyncio.create_task(load_models_async())
+
     yield
+
     # Clean up resources if needed on shutdown
     logger.info("Application shutting down.")
 
@@ -94,8 +116,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/health")
-async def health_check():
+@app.get("/healthz")
+async def liveness_check():
+    """A simple check to see if the service is alive."""
+    return {"status": "ok"}
+
+
+@app.get("/readyz")
+async def readiness_check():
+    """
+    Checks if the service is ready to serve requests by verifying that all models are loaded.
+    """
     unloaded_models = []
     if not globals.asr_engine:
         unloaded_models.append("ASR")
