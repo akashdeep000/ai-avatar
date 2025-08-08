@@ -61,17 +61,28 @@ def download_and_extract(url: str, output_dir: str) -> Path:
     # Extract the tar.bz2 file
     if file_name.endswith(".tar.bz2"):
         logger.info(f"Extracting {file_name}...")
-        with tarfile.open(file_path, "r:bz2") as tar:
-            members = tar.getmembers()
-            for member in tqdm(members, desc=f"Extracting {file_name}"):
-                tar.extract(member, path=output_dir)
-        logger.info("Extraction completed.")
+        try:
+            with tarfile.open(file_path, "r:bz2") as tar:
+                members = tar.getmembers()
+                for member in tqdm(members, desc=f"Extracting {file_name}"):
+                    tar.extract(member, path=output_dir)
+            logger.info("Extraction completed.")
 
-        # Delete the compressed file
-        os.remove(file_path)
-        logger.debug(f"Deleted the compressed file: {file_name}")
+            # Delete the compressed file
+            os.remove(file_path)
+            logger.debug(f"Deleted the compressed file: {file_name}")
 
-        return extracted_dir_path
+            return extracted_dir_path
+        except Exception as e:
+            logger.error(f"Failed to extract {file_name}: {e}")
+            # Optionally, clean up the partially extracted files and the downloaded archive
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            # You might want to remove the partially extracted directory as well
+            # import shutil
+            # if extracted_dir_path.exists():
+            #     shutil.rmtree(extracted_dir_path)
+            return None
     else:
         logger.warning("The downloaded file is not a tar.bz2 archive.")
         return Path(file_path)
@@ -112,10 +123,12 @@ def check_and_extract_local_file(url: str, output_dir: str) -> Path | None:
                 for member in tqdm(members, desc=f"Extracting {file_name}"):
                     tar.extract(member, path=output_dir)
             logger.success(f"Extracted archive to the path: {extracted_dir}")
-            os.remove(compressed_path)  # Remove the compressed file
+            os.remove(compressed_path)
             return extracted_dir
         except Exception as e:
-            logger.error(f"Fail to extract file: {str(e)}")
+            logger.error(f"Failed to extract {file_name}: {e}")
+            if os.path.exists(compressed_path):
+                os.remove(compressed_path)
             return None
 
     logger.warning(f"Local file not found or not a tar.bz2 archive: {compressed_path}")
