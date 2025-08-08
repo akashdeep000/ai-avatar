@@ -8,7 +8,7 @@ export const initialState: AIAvatarState = {
     messages: [],
     voiceInput: {
         mode: 'conversation',
-        continuous: false,
+        continuous: true,
     },
     character: null,
     isCharecterLoaded: false,
