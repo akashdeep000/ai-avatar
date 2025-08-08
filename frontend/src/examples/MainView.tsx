@@ -38,10 +38,10 @@ const MainView: React.FC = () => {
 
     return (
         <div className="flex h-full flex-col md:flex-row">
-            <div className="w-full h-2/3 md:w-2/3 md:h-full">
+            <div className="w-full h-2/3 md:min-w-1/2 md:h-full">
                 <AIAvatarCanvas onReady={() => setIsModelLoaded(true)} />
             </div>
-            <div className="w-full h-1/3 md:w-1/3 md:h-full border-t md:border-l md:border-t-0">
+            <div className="w-full h-1/3 md:w-1/2 md:max-w-xl md:h-full border-t md:border-l md:border-t-0">
                 <Chat
                     onSendMessage={sendText}
                     messages={messages}

@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface ChatProps {
     onSendMessage: (message: string) => void;
@@ -38,6 +38,17 @@ const Chat: React.FC<ChatProps> = ({
 }) => {
     const isRecording = asrState === 'LISTENING' || asrState === 'LISTENING_PROCESSING';
     const [inputValue, setInputValue] = useState('');
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const container = chatContainerRef.current;
+        if (container) {
+            const isScrolledToBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 150;
+            if (isScrolledToBottom) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+    }, [messages]);
 
     const handleSendMessage = () => {
         if (inputValue.trim()) {
@@ -56,7 +67,7 @@ const Chat: React.FC<ChatProps> = ({
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4" ref={chatContainerRef}>
                 {messages.map((msg, index) => (
                     <div key={index} className={`flex items-start gap-4 my-4 ${msg.author === 'user' ? 'justify-end' : ''}`}>
                         {msg.author === 'ai' && (
