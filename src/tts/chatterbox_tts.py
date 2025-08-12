@@ -1,19 +1,23 @@
 from loguru import logger
 import httpx
 from .tts_interface import TTSInterface
-from typing import Optional
+from typing import Optional, Any, Dict
 
 class ChatterboxTTS(TTSInterface):
     """
     A TTS implementation for the custom Chatterbox TTS service.
     """
 
-    def __init__(self, base_url: str, api_key: Optional[str] = None, voice_id: Optional[str] = None):
+    def __init__(self, base_url: str, api_key: Optional[str] = None, **kwargs):
         self.base_url = base_url
-        self.voice_id = voice_id
         self.headers = {}
         if api_key:
             self.headers["X-API-Key"] = api_key
+
+        self.tts_params: Dict[str, Any] = kwargs
+        if 'voice' in self.tts_params:
+            self.tts_params['voice_id'] = self.tts_params.pop('voice')
+
 
     async def synthesize(self, text: str) -> bytes:
         """
@@ -28,7 +32,7 @@ class ChatterboxTTS(TTSInterface):
         url = f"{self.base_url}/tts/generate"
         payload = {
             "text": text,
-            "voice_id": self.voice_id
+            **self.tts_params
         }
 
         async with httpx.AsyncClient() as client:

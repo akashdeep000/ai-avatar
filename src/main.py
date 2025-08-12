@@ -19,7 +19,7 @@ import time
 
 load_dotenv()
 
-from .config import app_config, llm_config, asr_config, tts_config
+from .config import app_config, llm_config, asr_config
 from .connection_manager import manager
 from .session_manager import session_manager, Session
 from .character_manager import character_manager

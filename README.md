@@ -98,6 +98,11 @@ The application can be configured through environment variables. The available o
 - `ASR_COMPUTE_TYPE`: The compute type for ASR. Options: `int8`, `fp16`, `fp32`.
 - `ASR_CPU_THREADS`: The number of CPU threads for ASR.
 
+### TTS Settings
+
+- `CHATTERBOX_TTS_BASE_URL`: The base URL for the Chatterbox TTS service.
+- `CHATTERBOX_TTS_API_KEY`: The API key for the Chatterbox TTS service.
+
 ### Available ASR Models
 
 | Model Name                  | `sherpa_onnx_asr` | `faster_whisper_asr` |
@@ -150,7 +155,6 @@ The following options are available for configuring a character:
 - `llm_persona`: The character's persona.
 - `live2d_model_name`: The name of the character's Live2D model.
 - `tts_engine`: The TTS engine to use for the character.
-- `extra_data`: Extra data for the character, such as a greeting message. (not in use currently)
 
 ### Live2D Models
 

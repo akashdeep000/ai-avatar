@@ -5,5 +5,3 @@ live2d_model_name: "mao_pro"
 tts_engine:
   name: "edge_tts"
   voice: "en-US-AvaMultilingualNeural"
-extra_data:
-  greeting_message: "Well, hello there. It's Evelyn. I've been waiting for you. What can I do for you today?"

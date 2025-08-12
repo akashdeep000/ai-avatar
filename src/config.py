@@ -19,10 +19,11 @@ class ASRConfig(BaseSettings):
     COMPUTE_TYPE: str = Field(default=None, description="Compute type for ASR.")
     CPU_THREADS: int = Field(default=4, description="Number of CPU threads for ASR.")
 
-class TTSConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix='TTS_', case_sensitive=False, env_file='.env', extra='ignore')
+class ChatterboxTTSConfig(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix='CHATTERBOX_TTS_', case_sensitive=False, env_file='.env', extra='ignore')
 
-    DEVICE: str = Field(default="cpu", description="Device for TTS inference, e.g. cpu, cuda")
+    BASE_URL: str = Field(default=None, description="Base URL for Chatterbox TTS.")
+    API_KEY: Optional[str] = Field(default=None, description="API key for Chatterbox TTS.")
 
 class AppConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix='APP_', case_sensitive=False, env_file='.env', extra='ignore')
@@ -36,4 +37,4 @@ class AppConfig(BaseSettings):
 app_config = AppConfig()
 llm_config = LLMConfig()
 asr_config = ASRConfig()
-tts_config = TTSConfig()
+chatterbox_tts_config = ChatterboxTTSConfig()
