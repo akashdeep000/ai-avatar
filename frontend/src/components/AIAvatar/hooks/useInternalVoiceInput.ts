@@ -16,7 +16,7 @@ export const useInternalVoiceInput = ({ voiceInputState, aiState, asrState, disp
 
     // Automatic interrupt for conversation mode
     const onSpeechRealStart = useCallback(() => {
-        if (voiceInputState.mode === 'conversation' && (aiState === 'SPEAKING' || aiState === 'THINKING_SPEAKING')) {
+        if (voiceInputState.mode === 'conversation' && (aiState === 'SPEAKING' || aiState === 'THINKING_SPEAKING' || aiState === 'THINKING')) {
             dispatch({ type: 'USER_INTERRUPT' });
             webSocketClient?.sendMessage('user:interrupt', {});
         }
